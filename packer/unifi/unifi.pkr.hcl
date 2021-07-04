@@ -32,9 +32,20 @@ source "vmware-iso" "unifi" {
     "<enter><wait>"
   ]
 
-  http_directory = "./http"
+  http_content = {
+    "/meta-data" = file("http/meta-data")
+    "/user-data" = templatefile("http/user-data.pkrtpl.hcl", { vm_password_hash = var.vm_password_hash })
+  }
 }
 
 build {
   sources = ["sources.vmware-iso.unifi"]
+
+  provisioner "shell" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get upgrade -y",
+      "sudo apt-get install ansible -y"
+    ]
+  }
 }

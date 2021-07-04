@@ -7,7 +7,7 @@ autoinstall:
     variant: us
   identity:
     hostname: unifi
-    password: "$6$UPW/wdlorw1$2SxqoeHxy0qrF9MsEMcVaiFBzVZTE4XEzBWk6BtFwja7giOGBBRzCJ9G.JpSr2YJT.EKK8K5SN43NexILIuhV1"
+    password: "${vm_password_hash}"
     username: ubuntu
   ssh:
     install-server: yes

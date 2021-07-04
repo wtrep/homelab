@@ -19,16 +19,21 @@ variable "network_name" {
 }
 
 variable "remote_host" {
-  type      = string
-  default   = "root"
+  type    = string
+  default = "root"
 }
 
 variable "remote_username" {
-  type      = string
-  default   = "root"
+  type    = string
+  default = "root"
 }
 
 variable "remote_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "vm_password_hash" {
   type      = string
   sensitive = true
 }
