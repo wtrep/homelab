@@ -48,4 +48,9 @@ build {
       "sudo apt-get install ansible -y"
     ]
   }
+
+  provisioner "ansible" {
+    playbook_file = "./ansible/unifi.yml"
+    use_proxy     = false # https://www.packer.io/docs/provisioners/ansible/ansible#troubleshooting
+  }
 }
