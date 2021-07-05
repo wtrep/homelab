@@ -1,16 +1,16 @@
 variable "cpus" {
   type    = number
-  default = 2
+  default = 1
 }
 
 variable "cores" {
   type    = number
-  default = 2
+  default = 1
 }
 
 variable "memory" {
   type    = number
-  default = 3072
+  default = 2048
 }
 
 variable "network_name" {
