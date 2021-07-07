@@ -11,11 +11,12 @@ source "vmware-iso" "unifi" {
 
   shutdown_command = "sudo -S shutdown -P now"
 
-  guest_os_type = "ubuntu-64"
-  cpus          = var.cpus
-  memory        = var.memory
-  cores         = var.cores
-  network_name  = var.network_name
+  guest_os_type        = "ubuntu-64"
+  cpus                 = var.cpus
+  memory               = var.memory
+  cores                = var.cores
+  network_adapter_type = "vmxnet3"
+  network_name         = var.network_name
 
   remote_type     = "esx5"
   remote_host     = var.remote_host
@@ -24,6 +25,7 @@ source "vmware-iso" "unifi" {
 
   vnc_over_websocket  = true # ESXi 7.0
   insecure_connection = true # Self signed certificate
+  version             = 18   # ESXi 7.0 U1
 
   boot_wait = "5s"
   boot_command = [
