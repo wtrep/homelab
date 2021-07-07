@@ -3,4 +3,5 @@ aws
 **.pkrvars.hcl
 **/packer_cache**
 **.tfvars
+**.terraform**
 **output-**
