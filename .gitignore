@@ -1,7 +1,0 @@
-aws
-.idea
-**.pkrvars.hcl
-**/packer_cache**
-**.tfvars
-**.terraform**
-**output-**

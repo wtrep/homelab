@@ -1,0 +1,32 @@
+---
+- name: Create .containers directory
+  ansible.builtin.file:
+    path: '{{ containers_folder }}'
+    state: directory
+    mode: '0755'
+
+- name: Copy docker-compose.yaml
+  ansible.builtin.copy:
+    src: docker-compose.yaml
+    dest: ~/.containers/docker-compose.yaml
+    mode: '0644'
+
+- name: Install dependencies for docker-compose ansible plugin
+  ansible.builtin.apt:
+    name:
+      - python3-dev
+      - python3-pip
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Install Python modules for docker-compose ansible plugin
+  ansible.builtin.pip:
+    name:
+      - docker-compose
+
+- name: Start all services
+  community.docker.docker_compose:
+    project_src: '{{ containers_folder }}'
+    remove_orphans: yes
+...
