@@ -5,11 +5,15 @@
     state: directory
     mode: '0755'
 
-- name: Copy docker-compose.yaml
-  ansible.builtin.copy:
-    src: docker-compose.yaml
-    dest: '{{ containers_folder }}/docker-compose.yaml'
-    mode: '0644'
+- name: Create appdata directories
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    mode: '0755'
+  become: true
+  loop:
+    - /opt/appdata/traefik
+    - /opt/appdata/unifi
 
 - name: Install dependencies for docker-compose ansible plugin
   ansible.builtin.apt:
@@ -24,6 +28,29 @@
   ansible.builtin.pip:
     name:
       - docker-compose
+
+- name: Initiate Docker Swarm
+  community.docker.docker_swarm:
+    state: present
+
+- name: Copy docker-compose.yaml
+  ansible.builtin.copy:
+    src: docker-compose.yaml
+    dest: '{{ containers_folder }}/docker-compose.yaml'
+    mode: '0644'
+
+- name: Copy traefik config
+  ansible.builtin.copy:
+    src: traefik.yaml
+    dest: /opt/appdata/traefik/traefik.yaml
+    mode: '0644'
+  become: true
+
+- name: Create Cloudflare secrets
+  community.docker.docker_secret:
+    name: cloudflare_api_token
+    data: '{{ cloudflare_api_token }}'
+    state: present
 
 - name: Start all services
   community.docker.docker_compose:
