@@ -8,7 +8,7 @@
 - name: Copy docker-compose.yaml
   ansible.builtin.copy:
     src: docker-compose.yaml
-    dest: ~/.containers/docker-compose.yaml
+    dest: '{{ containers_folder }}/docker-compose.yaml'
     mode: '0644'
 
 - name: Install dependencies for docker-compose ansible plugin

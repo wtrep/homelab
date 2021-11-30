@@ -7,6 +7,10 @@
     state: present
     update_cache: yes
   become: true
+  notify: Reboot machine
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Add Nvidia Container Runtime GPG Key
   ansible.builtin.apt_key:
@@ -31,5 +35,5 @@
   notify: Restart Docker service
 
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 ...
