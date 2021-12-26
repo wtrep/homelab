@@ -1,7 +1,19 @@
 ---
-- hosts: all
+- hosts: homeserver
   roles:
-    - nvidia
-    - docker
-    - containers
+    - role: nvidia/drivers
+      tags: 
+        - nvidia
+
+    - role: docker
+      tags: 
+        - docker
+
+    - role: nvidia/container_runtime
+      tags: 
+        - nvidia
+
+    - role: containers
+      tags: 
+        - containers
 ...

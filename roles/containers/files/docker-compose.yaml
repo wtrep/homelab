@@ -28,16 +28,15 @@ services:
       - /opt/appdata/unifi:/config
     labels:
       - traefik.enable=true
-      - traefik.http.routers.unifi.rule=Host(`homeserver.trep.cloud`)
+      - traefik.http.routers.unifi.rule=Host(`unifi.trep.cloud`)
       - traefik.http.routers.unifi.entrypoints=unifi
       - traefik.http.routers.unifi.tls=true
       - traefik.http.routers.unifi.tls.certresolver=cloudflare
-      - traefik.http.routers.unifi-http.rule=Host(`homeserver.trep.cloud`)
+      - traefik.http.routers.unifi-http.rule=Host(`unifi.trep.cloud`)
       - traefik.http.routers.unifi-http.entrypoints=unifi
       - traefik.http.routers.unifi-http.middlewares=unifi-http-redirect@docker
       - traefik.http.middlewares.unifi-http-redirect.redirectscheme.scheme=https
       - traefik.http.middlewares.unifi-http-redirect.redirectscheme.permanent=true
-      - traefik.http.middlewares.unifi-http-redirect.redirectscheme.port=8443
       - traefik.http.services.unifi.loadbalancer.server.scheme=https
       - traefik.http.services.unifi.loadbalancer.server.port=8443
     ports:

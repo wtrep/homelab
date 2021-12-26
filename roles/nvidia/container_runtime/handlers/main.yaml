@@ -1,8 +1,4 @@
 ---
-- name: Reboot machine
-  ansible.builtin.reboot:
-  become: true
-
 - name: Restart Docker service
   ansible.builtin.systemd:
     name: docker

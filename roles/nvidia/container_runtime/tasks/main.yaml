@@ -1,16 +1,4 @@
 ---
-- name: Ensure Nvidia drivers are installed
-  ansible.builtin.apt:
-    name:
-      - nvidia-driver-470-server
-    state: present
-    update_cache: yes
-  become: true
-  notify: Reboot machine
-
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
-
 - name: Ensure Nvidia Container Runtime GPG Key is present
   ansible.builtin.apt_key:
     url: https://nvidia.github.io/nvidia-docker/gpgkey
@@ -32,7 +20,4 @@
     update_cache: yes
   become: true
   notify: Restart Docker service
-
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
 ...

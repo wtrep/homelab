@@ -1,0 +1,10 @@
+---
+- name: Ensure Nvidia drivers are installed
+  ansible.builtin.apt:
+    name:
+      - nvidia-driver-470-server
+    state: present
+    update_cache: yes
+  become: true
+  notify: Reboot machine
+...
