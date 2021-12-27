@@ -15,24 +15,6 @@
     - /opt/appdata/traefik
     - /opt/appdata/unifi
 
-- name: Install dependencies for docker-compose ansible plugin
-  ansible.builtin.apt:
-    name:
-      - python3-dev
-      - python3-pip
-    state: present
-    update_cache: yes
-  become: true
-
-- name: Install Python modules for docker-compose ansible plugin
-  ansible.builtin.pip:
-    name:
-      - docker-compose
-
-- name: Initiate Docker Swarm
-  community.docker.docker_swarm:
-    state: present
-
 - name: Create Secrets
   community.docker.docker_secret:
     name: '{{ item }}'
