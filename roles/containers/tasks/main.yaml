@@ -31,7 +31,7 @@
     group: '{{ item }}'
     recurse: yes
   become: true
-  loop: '{{ users.keys() }}'
+  loop: '{{ services | services_with_persistent_data }}'
 
 - name: Create Secrets
   community.docker.docker_secret:

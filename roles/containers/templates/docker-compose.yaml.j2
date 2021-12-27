@@ -11,7 +11,9 @@ services:
       - traefik
     {% endif %}
     volumes:
-      - {{ docker_persistant_folder }}/{{ name }}:{{ details.container_persistant_directory }}
+      {% if details.container_persistent_directory is defined %}
+      - {{ docker_persistant_folder }}/{{ name }}:{{ details.container_persistent_directory }}
+      {% endif %}
       {% for volume in details.volumes | default([]) %}
       - {{ volume }}
       {% endfor %}

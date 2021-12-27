@@ -3,7 +3,7 @@ containers_folder: ~/.containers
 services:
   traefik:
     image: traefik
-    container_persistant_directory: /etc/traefik
+    container_persistent_directory: /etc/traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
@@ -17,7 +17,7 @@ services:
 
   unifi:
     image: linuxserver/unifi-controller
-    container_persistant_directory: /config
+    container_persistent_directory: /config
     load_balancer_port: 8443
     labels:
       - traefik.http.services.unifi.loadbalancer.server.scheme=https
@@ -27,7 +27,13 @@ services:
 
   flame:
     image: pawelmalak/flame
-    container_persistant_directory: /app/data
+    container_persistent_directory: /app/data
     load_balancer_port: 5005
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  shepherd:
+    image: mazzolino/shepherd
+    no_load_balancer: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
