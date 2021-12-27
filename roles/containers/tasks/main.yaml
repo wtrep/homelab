@@ -5,15 +5,33 @@
     state: directory
     mode: '0755'
 
+- name: Create a group for each service
+  ansible.builtin.group:
+    name: '{{ item }}'
+  become: true
+  loop: '{{ services.keys() }}'
+
+- name: Create a user for each service
+  ansible.builtin.user:
+    name: '{{ item }}'
+    group: '{{ item }}'
+    system: true
+  register: users
+  become: true
+  loop: '{{ services.keys() }}'
+
+- name: Setting users fact
+  set_fact: users='{{ users | parse_uid_and_gid }}'
+
 - name: Create appdata directories
   ansible.builtin.file:
-    path: '{{ item }}'
+    path: '{{ docker_persistant_folder }}/{{ item }}'
     state: directory
-    mode: '0755'
+    owner: '{{ item }}'
+    group: '{{ item }}'
+    recurse: yes
   become: true
-  loop:
-    - /opt/appdata/traefik
-    - /opt/appdata/unifi
+  loop: '{{ users.keys() }}'
 
 - name: Create Secrets
   community.docker.docker_secret:

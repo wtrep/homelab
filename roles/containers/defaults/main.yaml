@@ -18,9 +18,16 @@ services:
   unifi:
     image: linuxserver/unifi-controller
     container_persistant_directory: /config
+    load_balancer_port: 8443
     labels:
       - traefik.http.services.unifi.loadbalancer.server.scheme=https
-      - traefik.http.services.unifi.loadbalancer.server.port=8443
     ports:
       - 8080:8080
       - 3478:3478/udp
+
+  flame:
+    image: pawelmalak/flame
+    container_persistant_directory: /app/data
+    load_balancer_port: 5005
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro

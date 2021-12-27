@@ -6,7 +6,7 @@ services:
   {{ name }}:
     image: {{ details.image }}
     container_name: {{ name }}
-    {% if not details.no_load_balancer | default(False) %}
+    {% if name != 'traefik' %}
     depends_on:
       - traefik
     {% endif %}
@@ -15,29 +15,36 @@ services:
       {% for volume in details.volumes | default([]) %}
       - {{ volume }}
       {% endfor %}
-    {% if details.ports %}
+    {% if details.ports is defined %}
     ports:
       {% for port in details.ports %}
       - {{ port }}
       {% endfor %}
     {% endif %}
-    {% if details.environment is defined or details.secrets is defined %}
     environment:
+      - PUID={{ users[name].uid }}
+      - GUID={{ users[name].gid }}
+      - TZ={{ timezone }}
       {% for variable in details.environment | default([]) %}
       - {{ variable }}
       {% endfor %}
       {% for secret in details.secrets | default([]) %}
       - {{ secret }}_FILE=/run/secrets/{{ secret }}
       {% endfor %}
-    {% endif %}
     {% if details.labels is defined or details.no_load_balancer is not defined %}
     labels:
+      - flame.type=application
+      - flame.name={{ name }}
+      - flame.url=https://{{ name }}.{{ domain_name }}
       {% if not details.no_load_balancer | default(False) %}
       - traefik.enable=true
       - traefik.http.routers.{{ name }}.rule=Host(`{{ name }}.{{ domain_name }}`)
       - traefik.http.routers.{{ name }}.entrypoints=websecure
       - traefik.http.routers.{{ name }}.tls=true
       - traefik.http.routers.{{ name }}.tls.certresolver=cloudflare
+      {% if details.load_balancer_port is defined %}
+      - traefik.http.services.{{ name }}.loadbalancer.server.port={{ details.load_balancer_port }}
+      {% endif %}
       {% endif %}
       {% for label in details.labels | default([]) %}
       - {{ label }}
@@ -51,6 +58,7 @@ services:
       - {{ secret }}
       {% endfor %}
     {% endif %}
+    restart: unless-stopped
   {% endfor %}
 
 networks:
