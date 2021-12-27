@@ -1,2 +1,4 @@
+docker_persistant_folder: /opt/appdata
+domain_name: trep.cloud
 timezone: America/Montreal
 username: wtrep

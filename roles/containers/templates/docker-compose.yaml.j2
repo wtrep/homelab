@@ -1,0 +1,66 @@
+---
+version: "3.9"
+
+services:
+  {% for name, details in services.items() %}
+  {{ name }}:
+    image: {{ details.image }}
+    container_name: {{ name }}
+    {% if not details.no_load_balancer | default(False) %}
+    depends_on:
+      - traefik
+    {% endif %}
+    volumes:
+      - {{ docker_persistant_folder }}/{{ name }}:{{ details.container_persistant_directory }}
+      {% for volume in details.volumes | default([]) %}
+      - {{ volume }}
+      {% endfor %}
+    {% if details.ports %}
+    ports:
+      {% for port in details.ports %}
+      - {{ port }}
+      {% endfor %}
+    {% endif %}
+    {% if details.environment is defined or details.secrets is defined %}
+    environment:
+      {% for variable in details.environment | default([]) %}
+      - {{ variable }}
+      {% endfor %}
+      {% for secret in details.secrets | default([]) %}
+      - {{ secret }}_FILE=/run/secrets/{{ secret }}
+      {% endfor %}
+    {% endif %}
+    {% if details.labels is defined or details.no_load_balancer is not defined %}
+    labels:
+      {% if not details.no_load_balancer | default(False) %}
+      - traefik.enable=true
+      - traefik.http.routers.{{ name }}.rule=Host(`{{ name }}.{{ domain_name }}`)
+      - traefik.http.routers.{{ name }}.entrypoints=websecure
+      - traefik.http.routers.{{ name }}.tls=true
+      - traefik.http.routers.{{ name }}.tls.certresolver=cloudflare
+      {% endif %}
+      {% for label in details.labels | default([]) %}
+      - {{ label }}
+      {% endfor %}
+    {% endif %}
+    networks:
+      - internal
+    {% if details.secrets is defined %}
+    secrets:
+      {% for secret in details.secrets | default([]) %}
+      - {{ secret }}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+
+networks:
+  internal:
+
+{% set merged_secrets = services | extract_secrets_from_services %}
+{% if merged_secrets %}
+secrets:
+  {% for secret in merged_secrets %}
+  {{ secret }}:
+    external: true
+  {% endfor %}
+{% endif %}

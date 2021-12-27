@@ -1,4 +1,6 @@
 entryPoints:
+  websecure:
+    address: :443
   web:
     address: :80
     http:
@@ -6,12 +8,6 @@ entryPoints:
         entryPoint:
           to: websecure
           scheme: https
-  websecure:
-    address: :443
-  unifi:
-    address: :8443
-  traefik:
-    address: :9000
 
 ping: {}
 
@@ -21,7 +17,7 @@ providers:
 
 api:
   dashboard: true
-  insecure: true
+  insecure: false
 
 log:
   level: info
@@ -31,14 +27,10 @@ accessLog: {}
 certificatesResolvers:
   cloudflare:
     acme:
-      email: wtrep@icloud.com
+      email: {{ email }}
       storage: /etc/traefik/acme.json
       dnsChallenge:
         provider: cloudflare
-        delayBeforeCheck: 0
-        resolvers:
-          - 1.1.1.1:53
-          - 1.0.0.1:53
 
 serversTransport:
   insecureSkipVerify: true

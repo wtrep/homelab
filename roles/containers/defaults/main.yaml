@@ -1,1 +1,26 @@
 containers_folder: ~/.containers
+
+services:
+  traefik:
+    image: traefik
+    container_persistant_directory: /etc/traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.services.api@internal.loadbalancer.server.port=8080
+    secrets:
+      - CF_DNS_API_TOKEN
+
+  unifi:
+    image: linuxserver/unifi-controller
+    container_persistant_directory: /config
+    labels:
+      - traefik.http.services.unifi.loadbalancer.server.scheme=https
+      - traefik.http.services.unifi.loadbalancer.server.port=8443
+    ports:
+      - 8080:8080
+      - 3478:3478/udp

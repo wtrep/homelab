@@ -33,27 +33,32 @@
   community.docker.docker_swarm:
     state: present
 
-- name: Copy docker-compose.yaml
-  ansible.builtin.copy:
-    src: docker-compose.yaml
+- name: Create Secrets
+  community.docker.docker_secret:
+    name: '{{ item }}'
+    data: '{{ lookup("vars", "{{ item }}") }}'
+    state: present
+  loop: '{{ services | extract_secrets_from_services }}'
+
+- name: Copy templated docker-compose file
+  ansible.builtin.template:
+    src: templates/docker-compose.yaml.j2
     dest: '{{ containers_folder }}/docker-compose.yaml'
     mode: '0644'
+    lstrip_blocks: true
 
-- name: Copy traefik config
-  ansible.builtin.copy:
-    src: traefik.yaml
+- name: Copy templated traefik config file
+  ansible.builtin.template:
+    src: templates/traefik.yaml.j2
     dest: /opt/appdata/traefik/traefik.yaml
     mode: '0644'
+    lstrip_blocks: true
   become: true
 
-- name: Create Cloudflare secrets
-  community.docker.docker_secret:
-    name: cloudflare_api_token
-    data: '{{ cloudflare_api_token }}'
-    state: present
-
 - name: Start all services
-  community.docker.docker_compose:
-    project_src: '{{ containers_folder }}'
-    remove_orphans: yes
+  community.general.docker_stack:
+    state: present
+    name: home
+    compose:
+      - '{{ containers_folder }}/docker-compose.yaml'
 ...
