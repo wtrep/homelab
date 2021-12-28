@@ -63,7 +63,23 @@
 - name: Copy templated traefik config file
   ansible.builtin.template:
     src: templates/traefik.yaml.j2
-    dest: /opt/appdata/traefik/traefik.yaml
+    dest: '{{ docker_persistant_folder }}/traefik/traefik.yaml'
+    mode: '0644'
+    lstrip_blocks: true
+  become: true
+
+- name: Copy templated Prometheus config file
+  ansible.builtin.template:
+    src: templates/prometheus.yaml.j2
+    dest: '{{ docker_persistant_folder }}/prometheus/prometheus.yml'
+    mode: '0644'
+    lstrip_blocks: true
+  become: true
+
+- name: Copy templated Unpoller config file
+  ansible.builtin.template:
+    src: templates/unpoller.conf.j2
+    dest: '{{ docker_persistant_folder }}/unpoller/up.conf'
     mode: '0644'
     lstrip_blocks: true
   become: true

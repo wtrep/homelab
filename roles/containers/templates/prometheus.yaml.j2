@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: homeserver
+    static_configs:
+      {% for service in services | services_with_prometheus_endpoints %}
+      - targets: ["{{ service.endpoint }}"]
+        labels:
+          service: "{{ service.name }}"
+      {% endfor %}

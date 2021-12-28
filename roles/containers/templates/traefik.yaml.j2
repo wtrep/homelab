@@ -8,6 +8,12 @@ entryPoints:
         entryPoint:
           to: websecure
           scheme: https
+  traefik:
+    address: :9000
+
+metrics:
+  prometheus:
+    addRoutersLabels: true
 
 ping: {}
 
