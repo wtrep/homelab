@@ -84,6 +84,16 @@
     lstrip_blocks: true
   become: true
 
+- name: Copy templated snmp-exporter config file
+  ansible.builtin.template:
+    src: templates/snmp.yaml.j2
+    dest: '{{ docker_persistant_folder }}/snmp-exporter/snmp.yml'
+    mode: '0600'
+    lstrip_blocks: true
+    owner: snmp-exporter
+    group: snmp-exporter
+  become: true
+
 - name: Start all services
   community.general.docker_stack:
     state: present
@@ -91,5 +101,6 @@
     compose:
       - '{{ containers_folder }}/docker-compose.yaml'
     resolve_image: always
+    prune: yes
     with_registry_auth: yes
 ...

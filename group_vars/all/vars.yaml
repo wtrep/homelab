@@ -101,14 +101,23 @@ services:
     image: grafana/grafana-oss
     container_persistent_directory: /var/lib/grafana
     load_balancer_port: 3000
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel,grafana-simple-json-datasource
     set_user: true
 
   unpoller:
     image: golift/unifi-poller:latest
     container_persistent_directory: /config
-    load_balancer_port: 37288
     prometheus_endpoint: unpoller:9130
+    load_balancer_port: 9130
     volumes:
       - "{{ docker_persistant_folder }}/unpoller/up.conf:/etc/unifi-poller/up.conf"
     secrets:
       - UNIFI_RO_PASSWORD
+    set_user: true
+
+  snmp-exporter:
+    image: prom/snmp-exporter
+    container_persistent_directory: /etc/snmp_exporter
+    load_balancer_port: 9116
+    set_user: true
