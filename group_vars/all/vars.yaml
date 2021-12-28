@@ -66,6 +66,16 @@ services:
       - "{{ media_folder }}/downloads:/downloads"
       - "{{ media_folder }}/movies:/movies"
 
+  channels:
+    image: fancybits/channels-dvr:nvidia
+    container_persistent_directory: /channels-dvr
+    load_balancer_port: 8089
+    access_to_media: true
+    volumes:
+      - "{{ media_folder }}/recordings:/shares/DVR"
+    set_user: true
+    with_gpu: true
+
   jackett:
     image: lscr.io/linuxserver/jackett
     container_persistent_directory: /config
