@@ -15,11 +15,11 @@ services:
       - 80:80
       - 443:443
       - 9000:9000
+    environment:
+      - CF_DNS_API_TOKEN={{ CF_DNS_API_TOKEN }}
     labels:
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.api@internal.loadbalancer.server.port=8080
-    secrets:
-      - CF_DNS_API_TOKEN
 
   unifi:
     image: lscr.io/linuxserver/unifi-controller
@@ -42,6 +42,7 @@ services:
     access_to_docker_socket: true
     no_load_balancer: true
 
+  # Media
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd
     container_persistent_directory: /config
@@ -88,6 +89,29 @@ services:
     volumes:
       - "{{ media_folder }}/downloads:/downloads"
 
+  plex:
+    image: lscr.io/linuxserver/plex
+    container_persistent_directory: /config
+    load_balancer_port: 32400
+    access_to_media: true
+    environment:
+      - VERSION=docker
+    ports:
+      - 1900:1900/udp
+      - 3005:3005
+      - 5353:5353/udp
+      - 8324:8324
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+      - 32469:32469
+    volumes:
+      - "{{ media_folder }}/movies:/movies"
+      - "{{ media_folder }}/tv:/tv"
+    with_gpu: true
+
+  # Monitoring
   prometheus:
     image: prom/prometheus
     container_persistent_directory: /prometheus
@@ -121,3 +145,29 @@ services:
     container_persistent_directory: /etc/snmp_exporter
     load_balancer_port: 9116
     set_user: true
+
+  # Home automation
+  home:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_persistent_directory: /config
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    load_balancer_port: 8123
+
+  deconz:
+    image: ghcr.io/deconz-community/deconz-docker:latest
+    container_persistent_directory: /opt/deCONZ
+    load_balancer_port: 8085
+    devices:
+      - /dev/ttyACM0
+    environment:
+      - DECONZ_VNC_MODE=0
+      - DECONZ_WEB_PORT=8085
+      - DECONZ_WS_PORT=4043
+      - DEBUG_INFO=1
+      - DEBUG_APS=0
+      - DEBUG_ZCL=0
+      - DEBUG_ZDP=0
+      - DEBUG_OTAU=0
+    uid_environment_variable: DECONZ_UID
+    gid_environment_variable: DECONZ_GID

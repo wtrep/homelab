@@ -2,17 +2,32 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: homeserver
+  - job_name: services
     static_configs:
       {% for service in services | services_with_prometheus_endpoints %}
       - targets: ["{{ service.endpoint }}"]
         labels:
           service: "{{ service.name }}"
+          host: "homeserver"
       {% endfor %}
+
+  - job_name: homeserver
+    static_configs:
+      - targets: ["homeserver.trep.cloud:9100"]
+        labels:
+          host: "homeserver"
+
+  - job_name: pfsense
+    static_configs:
+      - targets: ["pfsense.trep.cloud:9100"]
+        labels:
+          host: "pfsense"
 
   - job_name: snmp_pfsense
     static_configs:
       - targets: ["pfsense.trep.cloud"] # SNMP device
+        labels:
+          host: "pfsense"
     metrics_path: "/snmp"
     params:
       module: [ pfsense ]

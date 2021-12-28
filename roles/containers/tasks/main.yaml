@@ -33,6 +33,14 @@
   become: true
   loop: '{{ services | services_with_media_access }}'
 
+- name: Add relevant users to the dialout group
+  ansible.builtin.user:
+    name: '{{ item }}'
+    groups: dialout
+    append: yes
+  become: true
+  loop: '{{ services | services_with_device_access }}'
+
 - name: Setting users fact
   set_fact: users='{{ users | parse_uid_and_gid }}'
 
@@ -46,25 +54,18 @@
   become: true
   loop: '{{ services | services_with_persistent_data }}'
 
-- name: Create Secrets
-  community.docker.docker_secret:
-    name: '{{ item }}'
-    data: '{{ lookup("vars", "{{ item }}") }}'
-    state: present
-  loop: '{{ services | extract_secrets_from_services }}'
-
 - name: Copy templated docker-compose file
   ansible.builtin.template:
     src: templates/docker-compose.yaml.j2
     dest: '{{ containers_folder }}/docker-compose.yaml'
-    mode: '0644'
+    mode: '0600'
     lstrip_blocks: true
 
 - name: Copy templated traefik config file
   ansible.builtin.template:
     src: templates/traefik.yaml.j2
     dest: '{{ docker_persistant_folder }}/traefik/traefik.yaml'
-    mode: '0644'
+    mode: '0600'
     lstrip_blocks: true
   become: true
 
@@ -72,7 +73,7 @@
   ansible.builtin.template:
     src: templates/prometheus.yaml.j2
     dest: '{{ docker_persistant_folder }}/prometheus/prometheus.yml'
-    mode: '0644'
+    mode: '0600'
     lstrip_blocks: true
   become: true
 
@@ -80,7 +81,7 @@
   ansible.builtin.template:
     src: templates/unpoller.conf.j2
     dest: '{{ docker_persistant_folder }}/unpoller/up.conf'
-    mode: '0644'
+    mode: '0600'
     lstrip_blocks: true
   become: true
 
@@ -95,12 +96,9 @@
   become: true
 
 - name: Start all services
-  community.general.docker_stack:
-    state: present
-    name: home
-    compose:
-      - '{{ containers_folder }}/docker-compose.yaml'
-    resolve_image: always
-    prune: yes
-    with_registry_auth: yes
+  community.docker.docker_compose:
+    project_src: '{{ containers_folder }}'
+    pull: yes
+    restarted: yes
+    remove_orphans: yes
 ...

@@ -60,9 +60,4 @@
   ansible.builtin.pip:
     name:
       - docker-compose
-
-- name: Initiate Docker Swarm
-  community.docker.docker_swarm:
-    state: present
-  become: true
 ...
