@@ -1,2 +1,5 @@
 [homeserver]
 homeserver.trep.cloud
+
+[router]
+pfsense.trep.cloud

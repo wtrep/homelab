@@ -17,6 +17,12 @@ services:
       {% for volume in details.volumes | default([]) %}
       - {{ volume }}
       {% endfor %}
+      {% if details.access_to_ro_docker_socket | default(False) %}
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      {% endif %}
+      {% if details.access_to_docker_socket | default(False) %}
+      - /var/run/docker.sock:/var/run/docker.sock
+      {% endif %}
     {% if details.ports is defined %}
     ports:
       {% for port in details.ports %}
@@ -61,6 +67,9 @@ services:
       {% endfor %}
     {% endif %}
     restart: unless-stopped
+    {% if details.set_user | default(False) %}
+    user: {{ users[name].uid }}:{{ users[name].gid }}
+    {% endif %}
   {% endfor %}
 
 networks:

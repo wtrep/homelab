@@ -5,6 +5,11 @@
     state: directory
     mode: '0755'
 
+- name: Create the mediaserver group
+  ansible.builtin.group:
+    name: mediaserver
+  become: true
+
 - name: Create a group for each service
   ansible.builtin.group:
     name: '{{ item }}'
@@ -19,6 +24,14 @@
   register: users
   become: true
   loop: '{{ services.keys() }}'
+
+- name: Add relevant users to the mediaserver group
+  ansible.builtin.user:
+    name: '{{ item }}'
+    groups: mediaserver
+    append: yes
+  become: true
+  loop: '{{ services | services_with_media_access }}'
 
 - name: Setting users fact
   set_fact: users='{{ users | parse_uid_and_gid }}'
@@ -61,4 +74,6 @@
     name: home
     compose:
       - '{{ containers_folder }}/docker-compose.yaml'
+    resolve_image: always
+    with_registry_auth: yes
 ...

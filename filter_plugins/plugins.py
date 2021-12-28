@@ -12,6 +12,14 @@ def parse_uid_and_gid(output):
     return {result["name"]: {"uid": result["uid"], "gid": result["group"]} for result in output["results"]}
 
 
+def services_with_docker_access(services):
+    return [name for (name, details) in services.items() if details.get("add_to_docker_group")]
+
+
+def services_with_media_access(services):
+    return [name for (name, details) in services.items() if details.get("access_to_media")]
+
+
 def services_with_persistent_data(services):
     return [name for (name, details) in services.items() if details.get("container_persistent_directory")]
 
@@ -20,6 +28,8 @@ class FilterModule(object):
     filter_map = {
         'extract_secrets_from_services': extract_secrets_from_services,
         'parse_uid_and_gid': parse_uid_and_gid,
+        'services_with_docker_access': services_with_docker_access,
+        'services_with_media_access': services_with_media_access,
         'services_with_persistent_data': services_with_persistent_data,
     }
 

@@ -1,4 +1,87 @@
-docker_persistant_folder: /opt/appdata
 domain_name: trep.cloud
 timezone: America/Montreal
 username: wtrep
+
+docker_persistant_folder: /opt/appdata
+media_folder: /tank
+
+services:
+  traefik:
+    image: traefik
+    container_persistent_directory: /etc/traefik
+    access_to_ro_docker_socket: true
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.services.api@internal.loadbalancer.server.port=8080
+    secrets:
+      - CF_DNS_API_TOKEN
+
+  unifi:
+    image: lscr.io/linuxserver/unifi-controller
+    container_persistent_directory: /config
+    load_balancer_port: 8443
+    labels:
+      - traefik.http.services.unifi.loadbalancer.server.scheme=https
+    ports:
+      - 8080:8080
+      - 3478:3478/udp
+
+  flame:
+    image: pawelmalak/flame
+    container_persistent_directory: /app/data
+    access_to_ro_docker_socket: true
+    load_balancer_port: 5005
+
+  shepherd:
+    image: mazzolino/shepherd
+    access_to_docker_socket: true
+    no_load_balancer: true
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd
+    container_persistent_directory: /config
+    load_balancer_port: 8080
+    access_to_media: true
+    volumes:
+      - "{{ media_folder }}/downloads:/downloads"
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_persistent_directory: /config
+    load_balancer_port: 8989
+    access_to_media: true
+    volumes:
+      - "{{ media_folder }}/downloads:/downloads"
+      - "{{ media_folder }}/tv:/tv"
+
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    container_persistent_directory: /config
+    load_balancer_port: 7878
+    access_to_media: true
+    volumes:
+      - "{{ media_folder }}/downloads:/downloads"
+      - "{{ media_folder }}/movies:/movies"
+
+  jackett:
+    image: lscr.io/linuxserver/jackett
+    container_persistent_directory: /config
+    load_balancer_port: 9117
+    access_to_media: true
+    volumes:
+      - "{{ media_folder }}/downloads:/downloads"
+
+  prometheus:
+    image: prom/prometheus
+    container_persistent_directory: /prometheus
+    load_balancer_port: 9090
+    set_user: true
+
+  grafana:
+    image: grafana/grafana-oss
+    container_persistent_directory: /var/lib/grafana
+    load_balancer_port: 3000
+    set_user: true
