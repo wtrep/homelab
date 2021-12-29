@@ -37,8 +37,8 @@ services:
     access_to_ro_docker_socket: true
     load_balancer_port: 5005
 
-  shepherd:
-    image: mazzolino/shepherd
+  watchtower:
+    image: containrrr/watchtower
     access_to_docker_socket: true
     no_load_balancer: true
 

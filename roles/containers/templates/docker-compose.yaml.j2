@@ -32,7 +32,7 @@ services:
     {% endif %}
     environment:
       - {{ details.uid_environment_variable | default("PUID") }}={{ users[name].uid }}
-      - {{ details.gid_environment_variable | default("GUID") }}={{ users[name].gid }}
+      - {{ details.gid_environment_variable | default("PGID") }}={{ users[name].gid }}
       - TZ={{ timezone }}
       {% for variable in details.environment | default([]) %}
       - {{ variable }}
@@ -57,8 +57,6 @@ services:
       - traefik.http.routers.{{ name }}.entrypoints=websecure
       - traefik.http.routers.{{ name }}.tls=true
       - traefik.http.routers.{{ name }}.tls.certresolver=cloudflare
-      - 'traefik.http.routers.{{ name }}.tls.domains[0].main="trep.cloud"'
-      - 'traefik.http.routers.{{ name }}.tls.domains[0].sans="*.trep.cloud"'
       {% if details.load_balancer_port is defined %}
       - traefik.http.services.{{ name }}.loadbalancer.server.port={{ details.load_balancer_port }}
       {% endif %}

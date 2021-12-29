@@ -44,6 +44,10 @@
 - name: Setting users fact
   set_fact: users='{{ users | parse_uid_and_gid }}'
 
+- name: Debug
+  debug:
+    msg: "{{ users }}"
+
 - name: Create appdata directories
   ansible.builtin.file:
     path: '{{ docker_persistant_folder }}/{{ item }}'
