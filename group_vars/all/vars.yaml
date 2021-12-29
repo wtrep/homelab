@@ -1,6 +1,7 @@
 domain_name: trep.cloud
 timezone: America/Montreal
 username: wtrep
+lan_network: 192.168.1.0/24
 
 docker_persistant_folder: /opt/appdata
 media_folder: /tank
@@ -44,12 +45,48 @@ services:
 
   # Media
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd
+    image: binhex/arch-sabnzbdvpn
     container_persistent_directory: /config
     load_balancer_port: 8080
     access_to_media: true
     volumes:
       - "{{ media_folder }}/downloads:/downloads"
+      - /etc/localtime:/etc/localtime:ro
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_ENABLED=yes
+      - VPN_USER={{ PIA_USERNAME }}
+      - VPN_PASS={{ PIA_PASSWORD }}
+      - VPN_PROV=pia
+      - VPN_CLIENT=openvpn
+      - STRICT_PORT_FORWARD=yes
+      - ENABLE_PRIVOXY=yes
+      - LAN_NETWORK={{ lan_network }}
+      - NAME_SERVERS=1.1.1.1,1.0.0.1
+      - UMASK=003
+
+  deluge:
+    image: binhex/arch-delugevpn
+    container_persistent_directory: /config
+    load_balancer_port: 8112
+    access_to_media: true
+    volumes:
+      - "{{ media_folder }}/downloads:/downloads"
+      - /etc/localtime:/etc/localtime:ro
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_ENABLED=yes
+      - VPN_USER={{ PIA_USERNAME }}
+      - VPN_PASS={{ PIA_PASSWORD }}
+      - VPN_PROV=pia
+      - VPN_CLIENT=openvpn
+      - STRICT_PORT_FORWARD=yes
+      - ENABLE_PRIVOXY=yes
+      - LAN_NETWORK={{ lan_network }}
+      - NAME_SERVERS=1.1.1.1,1.0.0.1
+      - UMASK=003
 
   sonarr:
     image: lscr.io/linuxserver/sonarr

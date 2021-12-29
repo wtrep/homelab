@@ -8,6 +8,7 @@
 - name: Create the mediaserver group
   ansible.builtin.group:
     name: mediaserver
+  register: mediaservergroup
   become: true
 
 - name: Create a group for each service
@@ -43,10 +44,6 @@
 
 - name: Setting users fact
   set_fact: users='{{ users | parse_uid_and_gid }}'
-
-- name: Debug
-  debug:
-    msg: "{{ users }}"
 
 - name: Create appdata directories
   ansible.builtin.file:
@@ -98,6 +95,18 @@
     owner: snmp-exporter
     group: snmp-exporter
   become: true
+
+- name: Copy OpenVPN config
+  ansible.builtin.copy:
+    src: openvpn
+    dest: '{{ docker_persistant_folder }}/{{ item }}'
+    mode: '0644'
+    owner: '{{ item }}'
+    group: '{{ item }}'
+  become: true
+  loop:
+    - sabnzbd
+    - deluge
 
 - name: Start all services
   community.docker.docker_compose:

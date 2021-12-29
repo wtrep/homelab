@@ -11,6 +11,12 @@ services:
     depends_on:
       - traefik
     {% endif %}
+    {% if details.cap_add is defined %}
+    cap_add:
+      {% for capacity in details.cap_add | default([]) %}
+      - {{ capacity }}
+      {% endfor %}
+    {% endif %}
     volumes:
       {% if details.container_persistent_directory is defined %}
       - {{ docker_persistant_folder }}/{{ name }}:{{ details.container_persistent_directory }}
@@ -30,9 +36,10 @@ services:
       - {{ port }}
       {% endfor %}
     {% endif %}
+    {% set service_gid = mediaservergroup.gid if (details.access_to_media | default(False)) else users[name].gid %}
     environment:
       - {{ details.uid_environment_variable | default("PUID") }}={{ users[name].uid }}
-      - {{ details.gid_environment_variable | default("PGID") }}={{ users[name].gid }}
+      - {{ details.gid_environment_variable | default("PGID") }}={{ service_gid }}
       - TZ={{ timezone }}
       {% for variable in details.environment | default([]) %}
       - {{ variable }}
