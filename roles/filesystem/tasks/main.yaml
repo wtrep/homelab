@@ -1,0 +1,13 @@
+---
+- name: Ensure directory for Samba shares exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0600"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  become: true
+  loop:
+    - "{{ data_root_folder }}"
+    - "{{ time_machine_root_folder }}"
+...

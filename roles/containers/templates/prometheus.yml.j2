@@ -8,7 +8,7 @@ scrape_configs:
       - targets: ["{{ service.endpoint }}"]
         labels:
           service: "{{ service.name }}"
-          host: "homeserver"
+          host: "{{ hostname }}"
       {% endfor %}
 
   - job_name: "home_assistant"
@@ -19,23 +19,23 @@ scrape_configs:
       - targets: ["home:8123"]
         labels:
           service: "home"
-          host: "homeserver"
+          host: "{{ hostname }}"
 
-  - job_name: homeserver
+  - job_name: "{{ hostname }}"
     static_configs:
-      - targets: ["homeserver.trep.cloud:9100"]
+      - targets: ["{{ hostname }}.{{ domain_name }}:9100"]
         labels:
-          host: "homeserver"
+          host: "{{ hostname }}"
 
   - job_name: pfsense
     static_configs:
-      - targets: ["pfsense.trep.cloud:9100"]
+      - targets: ["pfsense.{{ domain_name }}:9100"]
         labels:
           host: "pfsense"
 
   - job_name: snmp_pfsense
     static_configs:
-      - targets: ["pfsense.trep.cloud"] # SNMP device
+      - targets: ["pfsense.{{ domain_name }}"] # SNMP device
         labels:
           host: "pfsense"
     metrics_path: "/snmp"

@@ -1,10 +1,18 @@
+hostname: homeserver
 domain_name: trep.cloud
 timezone: America/Montreal
 username: wtrep
+
+# Network
 lan_network: 192.168.1.0/24
 
-docker_persistant_folder: /opt/appdata
+# File system
 media_folder: /tank
+data_root_folder: /minitank/data
+time_machine_root_folder: /minitank/timemachine
+
+# Containers
+docker_persistant_folder: /opt/appdata
 
 services:
   traefik:
@@ -217,3 +225,55 @@ services:
       - DEBUG_OTAU=0
     uid_environment_variable: DECONZ_UID
     gid_environment_variable: DECONZ_GID
+
+# Samba
+samba_apple_extensions: yes
+samba_global_include: global-include.conf
+samba_mitigate_cve_2017_7494: false
+samba_server_min_protocol: "SMB3"
+samba_server_max_protocol: "SMB3"
+samba_server_string: "{{ hostname }}"
+
+samba_users:
+  - name: "{{ username }}"
+    password: "{{ SAMBA_PASSWORD }}"
+
+samba_shares:
+  - name: Media
+    guest_ok: no
+    public: no
+    read_only: no
+    writable: yes
+    browseable: yes
+    owner: "{{ username }}"
+    path: "{{ media_folder }}"
+    valid_users: "{{ username }}"
+    write_list: "{{ username }}"
+
+  - name: Data
+    guest_ok: no
+    public: no
+    read_only: no
+    writable: yes
+    browseable: yes
+    owner: "{{ username }}"
+    path: "{{ data_root_folder }}"
+    valid_users: "{{ username }}"
+    write_list: "{{ username }}"
+
+  - name: TimeMachine
+    guest_ok: no
+    public: no
+    read_only: no
+    owner: "{{ username }}"
+    vfs_objects:
+      - name: fruit
+        options:
+        - name: time machine
+          value: 'yes'
+      - name: streams_xattr
+    writable: yes
+    browseable: yes
+    path: "{{ time_machine_root_folder }}"
+    valid_users: "{{ username }}"
+    write_list: "{{ username }}"

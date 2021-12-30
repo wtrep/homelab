@@ -3,4 +3,5 @@ collections:
   - pfsensible.core
 
 roles:
+  - bertvv.samba
   - cloudalchemy.node_exporter
