@@ -32,7 +32,7 @@
     groups: mediaserver
     append: yes
   become: true
-  loop: '{{ services | services_with_media_access }}'
+  loop: '{{ services | services_with_media_access + ["{{ username }}"] }}'
 
 - name: Add relevant users to the dialout group
   ansible.builtin.user:
@@ -40,7 +40,7 @@
     groups: dialout
     append: yes
   become: true
-  loop: '{{ services | services_with_device_access }}'
+  loop: '{{ services | services_with_device_access + ["{{ username }}"] }}'
 
 - name: Setting users fact
   set_fact: users='{{ users | parse_uid_and_gid }}'
@@ -62,60 +62,44 @@
     mode: '0600'
     lstrip_blocks: true
 
-- name: Copy templated traefik config file
+- name: Copy templated config files
   ansible.builtin.template:
-    src: templates/traefik.yaml.j2
-    dest: '{{ docker_persistant_folder }}/traefik/traefik.yaml'
+    src: 'templates/{{ item.file }}.j2'
+    dest: '{{ docker_persistant_folder }}/{{ item.service }}/{{ item.file }}'
     mode: '0600'
     lstrip_blocks: true
-  become: true
-
-- name: Copy templated Prometheus config file
-  ansible.builtin.template:
-    src: templates/prometheus.yaml.j2
-    dest: '{{ docker_persistant_folder }}/prometheus/prometheus.yml'
-    mode: '0600'
-    lstrip_blocks: true
-  become: true
-
-- name: Copy templated Unpoller config file
-  ansible.builtin.template:
-    src: templates/unpoller.conf.j2
-    dest: '{{ docker_persistant_folder }}/unpoller/up.conf'
-    mode: '0600'
-    lstrip_blocks: true
-  become: true
-
-- name: Copy templated snmp-exporter config file
-  ansible.builtin.template:
-    src: templates/snmp.yaml.j2
-    dest: '{{ docker_persistant_folder }}/snmp-exporter/snmp.yml'
-    mode: '0600'
-    lstrip_blocks: true
-    owner: snmp-exporter
-    group: snmp-exporter
-  become: true
-
-- name: Copy dcgm-exporter config file
-  ansible.builtin.copy:
-    src: default-counters.csv
-    dest: '{{ docker_persistant_folder }}/dcgm-exporter/default-counters.csv'
-    mode: '0600'
-    owner: dcgm-exporter
-    group: dcgm-exporter
-  become: true
-
-- name: Copy OpenVPN config
-  ansible.builtin.copy:
-    src: openvpn
-    dest: '{{ docker_persistant_folder }}/{{ item }}'
-    mode: '0644'
-    owner: '{{ item }}'
-    group: '{{ item }}'
+    owner: '{{ item.service }}'
+    group: '{{ item.service }}'
   become: true
   loop:
-    - sabnzbd
-    - deluge
+    - { file: 'traefik.yaml', service: 'traefik' }
+    - { file: 'prometheus.yml', service: 'prometheus' }
+    - { file: 'up.conf', service: 'unpoller' }
+    - { file: 'snmp.yml', service: 'snmp-exporter' }
+    - { file: 'up.conf', service: 'unpoller' }
+
+- name: Copy config files
+  ansible.builtin.copy:
+    src: '{{ item.file }}'
+    dest: '{{ docker_persistant_folder }}/{{ item.service }}/{{ item.file }}'
+    mode: '0600'
+    owner: '{{ item.service }}'
+    group: '{{ item.service }}'
+  become: true
+  loop:
+    - { file: 'default-counters.csv', service: 'dcgm-exporter' }
+
+- name: Copy config directories
+  ansible.builtin.copy:
+    src: '{{ item.directory }}'
+    dest: '{{ docker_persistant_folder }}/{{ item.directory }}'
+    mode: '0644'
+    owner: '{{ item.service }}'
+    group: '{{ item.service }}'
+  become: true
+  loop:
+    - { directory: 'openvpn', service: 'sabnzbd' }
+    - { directory: 'openvpn', service: 'deluge' }
 
 - name: Start all services
   community.docker.docker_compose:
