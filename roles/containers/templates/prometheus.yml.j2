@@ -11,6 +11,16 @@ scrape_configs:
           host: "homeserver"
       {% endfor %}
 
+  - job_name: "home_assistant"
+    metrics_path: /api/prometheus
+    authorization:
+      credentials: {{ HA_TOKEN }}
+    static_configs:
+      - targets: ["home:8123"]
+        labels:
+          service: "home"
+          host: "homeserver"
+
   - job_name: homeserver
     static_configs:
       - targets: ["homeserver.trep.cloud:9100"]
@@ -37,4 +47,4 @@ scrape_configs:
       - source_labels: [ __param_target ]
         target_label: instance
       - target_label: __address__
-        replacement: snmp-exporter:9116  # The SNMP exporter's real hostname:port.
+        replacement: snmp-exporter:9116  # The SNMP exporter's real hostname:port
