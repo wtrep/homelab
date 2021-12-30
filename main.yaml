@@ -29,4 +29,9 @@
       tags:
         - filesystem
       become: true
+
+    - role: geerlingguy.ntp
+      tags:
+        - ntp
+      become: true
 ...

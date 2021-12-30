@@ -5,3 +5,4 @@ collections:
 roles:
   - bertvv.samba
   - cloudalchemy.node_exporter
+  - geerlingguy.ntp

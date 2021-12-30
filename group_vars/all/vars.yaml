@@ -1,6 +1,7 @@
 hostname: homeserver
 domain_name: trep.cloud
 timezone: America/Montreal
+ntp_timezone: "{{ timezone }}"
 username: wtrep
 
 # Network
@@ -260,6 +261,10 @@ samba_shares:
     path: "{{ data_root_folder }}"
     valid_users: "{{ username }}"
     write_list: "{{ username }}"
+    create_mode: "0600"
+    directory_mode: "0700"
+    force_create_mode: "0600"
+    force_directory_mode: "0700"
 
   - name: TimeMachine
     guest_ok: no
@@ -277,3 +282,7 @@ samba_shares:
     path: "{{ time_machine_root_folder }}"
     valid_users: "{{ username }}"
     write_list: "{{ username }}"
+    create_mode: "0600"
+    directory_mode: "0700"
+    force_create_mode: "0600"
+    force_directory_mode: "0700"
