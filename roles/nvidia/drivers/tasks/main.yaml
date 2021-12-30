@@ -7,4 +7,18 @@
     update_cache: yes
   become: true
   notify: Reboot machine
+
+- name: Fetch patch repository
+  ansible.builtin.git:
+    repo: https://github.com/wtrep/nvidia-patch.git
+    dest: /opt/nvidia-patch
+    single_branch: yes
+    version: master
+  register: nvidia_patch
+  become: true
+
+- name: Run Nvidia patch script
+  ansible.builtin.shell: bash /opt/nvidia-patch/patch.sh
+  when: nvidia_patch.changed
+  become: true
 ...

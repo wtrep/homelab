@@ -96,6 +96,15 @@
     group: snmp-exporter
   become: true
 
+- name: Copy dcgm-exporter config file
+  ansible.builtin.copy:
+    src: default-counters.csv
+    dest: '{{ docker_persistant_folder }}/dcgm-exporter/default-counters.csv'
+    mode: '0600'
+    owner: dcgm-exporter
+    group: dcgm-exporter
+  become: true
+
 - name: Copy OpenVPN config
   ansible.builtin.copy:
     src: openvpn
@@ -112,6 +121,5 @@
   community.docker.docker_compose:
     project_src: '{{ containers_folder }}'
     pull: yes
-    restarted: yes
     remove_orphans: yes
 ...
