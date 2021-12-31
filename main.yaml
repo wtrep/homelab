@@ -23,15 +23,22 @@
 
     - role: filesystem
       tags:
+        - base
         - filesystem
 
     - role: bertvv.samba
       tags:
+        - base
         - filesystem
       become: true
 
     - role: geerlingguy.ntp
       tags:
         - ntp
+      become: base
+
+    - role: jnv.unattended-upgrades
+      tags:
+        - base
       become: true
 ...

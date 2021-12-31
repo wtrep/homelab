@@ -274,3 +274,11 @@ samba_shares:
     directory_mode: "0700"
     force_create_mode: "0600"
     force_directory_mode: "0700"
+
+# Unattended upgrades
+unattended_origins_patterns:
+  - 'origin=Ubuntu,archive=${distro_codename}-security'
+  - 'o=Ubuntu,a=${distro_codename}'
+  - 'o=Ubuntu,a=${distro_codename}-updates'
+unattended_automatic_reboot: true
+unattended_automatic_reboot_time: 05:00
