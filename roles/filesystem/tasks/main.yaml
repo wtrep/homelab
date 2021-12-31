@@ -10,4 +10,16 @@
   loop:
     - "{{ data_root_folder }}"
     - "{{ time_machine_root_folder }}"
+
+- name: Add a cron for ZFS scrub
+  ansible.builtin.cron:
+    name: "Scrub {{ item.pool }} pool"
+    minute: "0"
+    hour: "2"
+    day: "{{ item.day }}"
+    job: "/sbin/zpool scrub {{ item.pool }}"
+  become: true
+  loop:
+    - { pool: "tank", day: "1" }
+    - { pool: "minitank", day: "7" }
 ...
