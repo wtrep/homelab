@@ -2,7 +2,8 @@
 - hosts: homeserver
   roles:
     - role: nvidia/drivers
-      tags: 
+      tags:
+        - base
         - nvidia
 
     - role: docker
