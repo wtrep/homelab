@@ -129,7 +129,10 @@ services:
     access_to_media: true
     environment:
       - VERSION=docker
+    labels:
+      - traefik.http.services.plex.loadbalancer.server.scheme=https
     ports:
+      - 32400:32400
       - 1900:1900/udp
       - 3005:3005
       - 5353:5353/udp
