@@ -54,25 +54,13 @@ services:
 
   # Media
   sabnzbd:
-    image: binhex/arch-sabnzbdvpn
+    image: lscr.io/linuxserver/sabnzbd
     container_persistent_directory: /config
     load_balancer_port: 8080
     access_to_media: true
     volumes:
       - "{{ media_folder }}/downloads:/downloads"
-      - /etc/localtime:/etc/localtime:ro
-    cap_add:
-      - NET_ADMIN
     environment:
-      - VPN_ENABLED=yes
-      - VPN_USER={{ PIA_USERNAME }}
-      - VPN_PASS={{ PIA_PASSWORD }}
-      - VPN_PROV=pia
-      - VPN_CLIENT=openvpn
-      - STRICT_PORT_FORWARD=yes
-      - ENABLE_PRIVOXY=yes
-      - LAN_NETWORK={{ lan_network }}
-      - NAME_SERVERS=1.1.1.1,1.0.0.1
       - UMASK=003
 
   deluge:
@@ -82,7 +70,6 @@ services:
     access_to_media: true
     volumes:
       - "{{ media_folder }}/downloads:/downloads"
-      - /etc/localtime:/etc/localtime:ro
     cap_add:
       - NET_ADMIN
     environment:
@@ -205,8 +192,6 @@ services:
   home:
     image: ghcr.io/home-assistant/home-assistant:stable
     container_persistent_directory: /config
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
     load_balancer_port: 8123
 
   deconz:
@@ -248,8 +233,8 @@ samba_shares:
     browseable: yes
     owner: "{{ username }}"
     path: "{{ media_folder }}"
-    valid_users: "{{ username }}"
-    write_list: "{{ username }}"
+    valid_users: "@mediaserver"
+    write_list: "@mediaserver"
 
   - name: Data
     guest_ok: no

@@ -30,6 +30,7 @@ services:
       {% if details.access_to_docker_socket | default(False) %}
       - /var/run/docker.sock:/var/run/docker.sock
       {% endif %}
+      - /etc/localtime:/etc/localtime:ro
     {% if details.ports is defined %}
     ports:
       {% for port in details.ports %}

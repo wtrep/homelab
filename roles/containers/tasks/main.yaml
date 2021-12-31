@@ -98,7 +98,6 @@
     group: '{{ item.service }}'
   become: true
   loop:
-    - { directory: 'openvpn', service: 'sabnzbd' }
     - { directory: 'openvpn', service: 'deluge' }
 
 - name: Start all services
