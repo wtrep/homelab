@@ -11,9 +11,10 @@ lan_network: 192.168.1.0/24
 media_folder: /tank
 data_root_folder: /minitank/data
 time_machine_root_folder: /minitank/timemachine
+docker_persistent_backup_folder: /minitank/appdata
 
 # Containers
-docker_persistant_folder: /opt/appdata
+docker_persistent_folder: /opt/appdata
 
 services:
   traefik:
@@ -155,13 +156,14 @@ services:
     prometheus_endpoint: localhost:9090
     set_user: true
     volumes:
-      - '{{ docker_persistant_folder }}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
+      - '{{ docker_persistent_folder }}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
 
   grafana:
     image: grafana/grafana-oss
     container_persistent_directory: /var/lib/grafana
     load_balancer_port: 3000
     environment:
+      - GF_PATHS_CONFIG=/var/lib/grafana/grafana.ini
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel,grafana-simple-json-datasource
     set_user: true
 
@@ -171,7 +173,7 @@ services:
     prometheus_endpoint: unpoller:9130
     load_balancer_port: 9130
     volumes:
-      - "{{ docker_persistant_folder }}/unpoller/up.conf:/etc/unifi-poller/up.conf"
+      - "{{ docker_persistent_folder }}/unpoller/up.conf:/etc/unifi-poller/up.conf"
     secrets:
       - UNIFI_RO_PASSWORD
     set_user: true

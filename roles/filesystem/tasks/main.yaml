@@ -1,25 +1,37 @@
 ---
-- name: Ensure directory for Samba shares exist
+- name: Ensure directory exists
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: "0600"
+    mode: "0700"
     owner: "{{ username }}"
     group: "{{ username }}"
   become: true
   loop:
     - "{{ data_root_folder }}"
     - "{{ time_machine_root_folder }}"
+    - "{{ docker_persistent_backup_folder }}"
 
-- name: Add a cron for ZFS scrub
+- name: Ensure cron for ZFS scrub exists
   ansible.builtin.cron:
     name: "Scrub {{ item.pool }} pool"
     minute: "0"
-    hour: "2"
+    hour: "4"
     day: "{{ item.day }}"
     job: "/sbin/zpool scrub {{ item.pool }}"
   become: true
   loop:
     - { pool: "tank", day: "1" }
     - { pool: "minitank", day: "7" }
+
+- name: Ensure cron for Docker persistant data backup exists
+  ansible.builtin.cron:
+    name: "Backup Docker persistent data"
+    minute: "0"
+    hour: "2"
+    job: >
+      docker stop $(docker ps -q);
+      rsync -avz --delete {{ docker_persistent_folder }} {{ docker_persistent_backup_folder }};
+      docker start $(docker ps -a -q)
+  become: true
 ...

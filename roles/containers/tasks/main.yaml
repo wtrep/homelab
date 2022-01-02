@@ -47,7 +47,7 @@
 
 - name: Create appdata directories
   ansible.builtin.file:
-    path: '{{ docker_persistant_folder }}/{{ item }}'
+    path: '{{ docker_persistent_folder }}/{{ item }}'
     state: directory
     owner: '{{ item }}'
     group: '{{ item }}'
@@ -65,7 +65,7 @@
 - name: Copy templated config files
   ansible.builtin.template:
     src: 'templates/{{ item.file }}.j2'
-    dest: '{{ docker_persistant_folder }}/{{ item.service }}/{{ item.file }}'
+    dest: '{{ docker_persistent_folder }}/{{ item.service }}/{{ item.file }}'
     mode: '0600'
     lstrip_blocks: true
     owner: '{{ item.service }}'
@@ -81,7 +81,7 @@
 - name: Copy config files
   ansible.builtin.copy:
     src: '{{ item.file }}'
-    dest: '{{ docker_persistant_folder }}/{{ item.service }}/{{ item.file }}'
+    dest: '{{ docker_persistent_folder }}/{{ item.service }}/{{ item.file }}'
     mode: '0600'
     owner: '{{ item.service }}'
     group: '{{ item.service }}'
@@ -92,7 +92,7 @@
 - name: Copy config directories
   ansible.builtin.copy:
     src: '{{ item.directory }}'
-    dest: '{{ docker_persistant_folder }}/{{ item.directory }}'
+    dest: '{{ docker_persistent_folder }}/{{ item.directory }}'
     mode: '0644'
     owner: '{{ item.service }}'
     group: '{{ item.service }}'

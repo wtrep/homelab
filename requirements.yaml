@@ -3,7 +3,8 @@ collections:
   - pfsensible.core
 
 roles:
+  - src: git+https://github.com/cloudalchemy/ansible-node-exporter
+    version: 908dfe0ab68af88ef929e49d8505eb5d44cf420f
   - bertvv.samba
-  - cloudalchemy.node_exporter
   - geerlingguy.ntp
   - jnv.unattended-upgrades

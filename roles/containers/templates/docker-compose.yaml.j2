@@ -19,7 +19,7 @@ services:
     {% endif %}
     volumes:
       {% if details.container_persistent_directory is defined %}
-      - {{ docker_persistant_folder }}/{{ name }}:{{ details.container_persistent_directory }}
+      - {{ docker_persistent_folder }}/{{ name }}:{{ details.container_persistent_directory }}
       {% endif %}
       {% for volume in details.volumes | default([]) %}
       - {{ volume }}

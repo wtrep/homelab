@@ -18,7 +18,7 @@
       tags: 
         - containers
 
-    - role: cloudalchemy.node_exporter
+    - role: ansible-node-exporter
       tags:
         - monitoring
 
@@ -35,8 +35,9 @@
 
     - role: geerlingguy.ntp
       tags:
+        - base
         - ntp
-      become: base
+      become: true
 
     - role: jnv.unattended-upgrades
       tags:
